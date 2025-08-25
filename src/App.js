@@ -1,25 +1,223 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
+import {
+  Background,
+  ReactFlow,
+    MiniMap,
+  applyNodeChanges,
+  applyEdgeChanges,
+  addEdge,
+  ReactFlowProvider,
+  useReactFlow,
+  MarkerType,
+} from '@xyflow/react';
+import '@xyflow/react/dist/style.css';
+import NodePalette from './components/node-palette';
+import CustomEdge from './components/custom-edge';
+import UpdateNode from './components/update-node';
+import CircleNode from './components/circle-node';
+import DiamondNode from './components/diamond-node';
+import RectangleNode from './components/reactangle-node';
+import NodeWithToolbar from './components/node-toolbar';
 
-function App() {
+const defaultViewport = { x: 0, y: 0, zoom: 1.5 };
+
+const initialNodes = [
+  {
+    id: '1',
+    position: { x: 100, y: 100 },
+    data: { label: 'Start' },
+    type: 'node-with-toolbar'  },
+];
+
+const initialEdges = [];
+
+let nodeId = 2;
+
+const FlowComponent = () => {
+  const [nodes, setNodes] = useState(initialNodes);
+  const [edges, setEdges] = useState(initialEdges);
+  const [showUpdatePanel, setShowUpdatePanel] = useState(false);
+  const [selectedNode, setSelectedNode] = useState(null);
+  const reactFlowWrapper = useRef(null);
+  const { getViewport } = useReactFlow();
+
+  const nodeTypes = {
+  circle: CircleNode,
+  diamond: DiamondNode,
+  rectangle: RectangleNode,
+  'node-with-toolbar': (props) => (
+    <NodeWithToolbar {...props} setEdges={setEdges} setNodes={setNodes} onUpdateNode={handleUpdateNode} selectedNode={selectedNode}/>
+  ),
+};
+
+useEffect(() => {
+    const originalError = console.error;
+    console.error = (...args) => {
+      if (args[0]?.includes?.('ResizeObserver loop completed with undelivered notifications')) {
+        return; // Suppress this specific error
+      }
+      originalError.apply(console, args);
+    };
+
+    return () => {
+      console.error = originalError;
+    };
+  }, []);
+
+const handleUpdateNode = (nodeId, nodeData) => {
+    setSelectedNode({ id: nodeId, data: nodeData });
+    setShowUpdatePanel(true);
+  };
+
+  const onNodesChange = useCallback(
+    (changes) => setNodes((nodesSnapshot) => applyNodeChanges(changes, nodesSnapshot)),
+    [],
+  );
+
+  const onEdgesChange = useCallback(
+    (changes) => setEdges((edgesSnapshot) => applyEdgeChanges(changes, edgesSnapshot)),
+    [],
+  );
+
+   const onConnect = useCallback(
+    (connection) => {
+      const edge = { ...connection};
+      setEdges((eds) => addEdge(edge, eds));
+    },
+    [setEdges],
+  );
+ 
+  const onDragOver = useCallback((event) => {
+    event.preventDefault();
+    event.dataTransfer.dropEffect = 'move';
+  }, []);
+ 
+ const onDrop = useCallback(
+  (event) => {
+    event.preventDefault();
+
+    const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
+    const type = event.dataTransfer.getData('application/reactflow');
+    const label = event.dataTransfer.getData('application/reactflow-label');
+
+    if (typeof type === 'undefined' || !type) {
+      return;
+    }
+
+    const viewport = getViewport();
+    const position = {
+      x: (event.clientX - reactFlowBounds.left - viewport.x) / viewport.zoom,
+      y: (event.clientY - reactFlowBounds.top - viewport.y) / viewport.zoom,
+    };
+
+    const newNode = {
+      id: `${nodeId++}`,
+      type: 'node-with-toolbar',
+      position,
+      data: { 
+        label,
+        originalType: type,
+        nodeType: type
+      },
+    };
+    setNodes((nds) => nds.concat(newNode));
+  },
+  [getViewport],
+);
+   const edgeTypes = {
+  'custom-edge': (props) => (
+      <CustomEdge {...props} setEdges={setEdges} markerEnd={{
+        type: MarkerType.ArrowClosed,
+      }}
+      style={{
+        strokeWidth: 1,
+        stroke: '#b1b1b7',
+      }} />
+      
+    ),
+};
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div style={{ height: '100vh', width: '100%', display: 'flex' }}>
+      <NodePalette/>
+      <div style={{ flex: 1, height: '100%' }} ref={reactFlowWrapper}>
+      <ReactFlow
+        nodes={nodes}
+        edges={edges}
+        onNodesChange={onNodesChange}
+        onEdgesChange={onEdgesChange}
+        onConnect={onConnect}
+        onDragOver={onDragOver}
+        onDrop={onDrop}
+        nodeTypes={nodeTypes}
+        edgeTypes={edgeTypes}
+        defaultViewport={defaultViewport}
+        minZoom={0.2}
+        maxZoom={4}
+        attributionPosition="bottom-left"
+        fitView
+        fitViewOptions={{ padding: 0.5 }}
+        defaultEdgeOptions={{
+    markerEnd: {
+      type: MarkerType.ArrowClosed,
+    },
+    style: {
+      strokeWidth: 1,
+      stroke: '#b1b1b7',
+    },
+  }}
+      >
+        <Background />
+      </ReactFlow>
+      </div>
+      {showUpdatePanel && selectedNode && (
+          <div style={{
+            width: '300px',
+            backgroundColor: 'white',
+            borderLeft: '1px solid #ddd',
+            padding: '20px',
+            overflowY: 'auto',
+            boxShadow: '-2px 0 5px rgba(0,0,0,0.1)'
+          }}>
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginBottom: '20px',
+              borderBottom: '1px solid #eee',
+              paddingBottom: '10px'
+            }}>
+              <h3>Update Node: {selectedNode.id}</h3>
+              <button
+                onClick={() => setShowUpdatePanel(false)}
+                style={{
+                  background: '#dc3545',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '4px',
+                  padding: '8px 12px',
+                  cursor: 'pointer'
+                }}
+              >
+                ✕
+              </button>
+            </div>
+            
+            <UpdateNode 
+              setNodes={setNodes} 
+              setEdges={setEdges}
+              selectedNode={selectedNode}
+            />
+          </div>
+        )}
     </div>
   );
+};
+ 
+export default function App() {
+  return (
+  <ReactFlowProvider>
+      <FlowComponent />
+  </ReactFlowProvider>
+);
 }
-
-export default App;
