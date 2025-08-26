@@ -12,8 +12,8 @@ const NodePalette=()=>{
               event.dataTransfer.setData('application/reactflow-label', 'Process');
             }}
             style={{
-              width: '80px',
-              height: '35px',
+              width: '50px',
+              height: '30px',
               border: '2px solid #7f8c8d',
               borderRadius: '8px',
               display: 'flex',
@@ -34,8 +34,8 @@ const NodePalette=()=>{
               event.dataTransfer.setData('application/reactflow-label', 'Decision');
             }}
             style={{
-              width: '80px',
-              height: '80px',
+              width: '40px',
+              height: '40px',
               borderRadius: '50%',
               border: '2px solid #ff5252',
               display: 'flex',
@@ -56,8 +56,8 @@ const NodePalette=()=>{
               event.dataTransfer.setData('application/reactflow-label', 'Condition');
             }}
             style={{
-              width: '60px',
-              height: '60px',
+              width: '40px',
+              height: '40px',
               border: '2px solid #45b7aa',
               transform: 'rotate(45deg)',
               display: 'flex',

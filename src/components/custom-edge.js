@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { BaseEdge, EdgeLabelRenderer, getBezierPath, MarkerType } from '@xyflow/react';
+import { BaseEdge, EdgeLabelRenderer, getBezierPath, MarkerType, getSmoothStepPath } from '@xyflow/react';
 import ConnectorProperties from './connector-properties';
 
 const CustomEdge = ({
@@ -22,7 +22,7 @@ const CustomEdge = ({
   const [editLabel, setEditLabel] = useState(label || '');
   const [showToolbar, setShowToolbar] = useState(false);
 
-  const [edgePath, labelX, labelY] = getBezierPath({
+  const [edgePath, labelX, labelY] = getSmoothStepPath({
     sourceX,
     sourceY,
     sourcePosition,
@@ -45,44 +45,9 @@ const CustomEdge = ({
     setIsEditing(false);
   };
 
-  const handleDeleteEdge = () => {
-    console.log("Deleting edge:", id);
-    if (setEdges) {
-      setEdges((edges) => edges.filter((edge) => edge.id !== id));
-    } else {
-      console.error("setEdges function is not available");
-    }
-  };
-
-  // Change line style
-  const changeLineStyle = (newStyle) => {
-    if (setEdges) {
-      setEdges((edges) =>
-        edges.map((edge) =>
-          edge.id === id ? { 
-            ...edge, 
-            data: { ...edge.data, lineType: newStyle } 
-          } : edge
-        )
-      );
-    }
-  };
-
-  // Change edge color
-  const changeEdgeColor = (newColor) => {
-    if (setEdges) {
-      setEdges((edges) =>
-        edges.map((edge) =>
-          edge.id === id ? { 
-            ...edge, 
-            data: { ...edge.data, edgeColor: newColor } 
-          } : edge
-        )
-      );
-    }
-  };
-
   const getLineStyle = () => {
+    console.log("line style", data);
+    
     const lineType = data?.lineType || 'solid';
     const edgeColor = data?.edgeColor || '#b1b1b7';
     
@@ -103,8 +68,14 @@ const CustomEdge = ({
         return { ...baseStyle, strokeDasharray: '10,5' };
       default:
         return baseStyle;
-    }
+    }    
   };
+
+  const handleConnectorClick = (e)=>{    
+    onEdgeClick(id,data, label)
+  }
+  console.log("styleee", getLineStyle());
+  
 
   return (
     <>
@@ -117,50 +88,50 @@ const CustomEdge = ({
         style={getLineStyle()}
       /> */}
 
-       <svg
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100%',
-          pointerEvents: 'none',
-          zIndex: 1,
-        }}
-          onClick={()=>onEdgeClick(selectedEdge?.id, "", selectedEdge?.label)}
-      >
-        <defs>
-          <marker
-            id={`arrow-${id}`}
-            markerWidth="10"
-            markerHeight="10"
-            refX="9"
-            refY="3"
-            orient="auto"
-            markerUnits="strokeWidth"
-          >
-            <polygon
-              points="0,0 0,6 9,3"
-              fill={getLineStyle().stroke}
-            />
-          </marker>
-        </defs>
-        
-        <path
-          d={edgePath}
-          stroke={getLineStyle().stroke}
-          strokeWidth={getLineStyle().strokeWidth}
-          fill="none"
-          markerEnd={`url(#arrow-${id})`}
-          style={{
-            pointerEvents: 'all',
-            cursor: 'pointer',
-          }}
-        
-        />
-      </svg>
+<svg
+  style={{
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    pointerEvents: 'none',
+    zIndex: 1,
+  }}
+  onClick={(e) => handleConnectorClick(e)}
+>
+  <defs>
+    <marker
+      id={`arrow-${id}`}
+      markerWidth="10"
+      markerHeight="10"
+      refX="9"
+      refY="3"
+      orient="auto"
+      markerUnits="strokeWidth"
+    >
+      <polygon
+        points="0,0 0,6 9,3"
+        fill={getLineStyle().stroke}
+      />
+    </marker>
+  </defs>
+  
+  <path
+    d={edgePath}
+    stroke={getLineStyle().stroke}
+    strokeWidth={getLineStyle().strokeWidth}
+    fill="none"
+    markerEnd={`url(#arrow-${id})`}
+    strokeDasharray={getLineStyle().strokeDasharray}  // ✅ This is the key fix
+    style={{
+      pointerEvents: 'all',
+      cursor: 'pointer',
+    }}
+  />
+</svg>
+
        <EdgeLabelRenderer>
-        {/* Show the label if it exists */}
         {selectedEdge.label && (
           <div
             style={{
@@ -170,7 +141,7 @@ const CustomEdge = ({
               backgroundColor: 'white',
               padding: '4px 8px',
               borderRadius: '4px',
-              border: '1px solid #ccc',
+            //   border: '1px solid #ccc',
               fontSize: '12px',
               minWidth: '60px',
               textAlign: 'center',
@@ -179,7 +150,7 @@ const CustomEdge = ({
               zIndex: 1000,
             }}
             className="nodrag nopan"
-            onClick={()=>onEdgeClick(selectedEdge.id, "", selectedEdge.label)}
+            onClick={()=>onEdgeClick(id, data, label)}
             title="Double-click to edit"
           >
             {selectedEdge.label}

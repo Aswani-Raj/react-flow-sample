@@ -87,6 +87,7 @@ const handleUpdateNode = (nodeId, nodeData) => {
     const edge = { 
       ...connection, 
       type: 'custom-edge',
+      data: {}, 
     };
     setEdges((eds) => addEdge(edge, eds));
   },
@@ -143,7 +144,7 @@ const handleUpdateNode = (nodeId, nodeData) => {
         stroke: '#b1b1b7',
       }} 
       onEdgeClick={handleEdgeClick}
-       selectedEdge={selectedEdge}
+       selectedEdge={selectedEdge}       
     />
   ),
 };
