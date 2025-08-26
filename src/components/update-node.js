@@ -24,7 +24,6 @@ const UpdateNode = (props) => {
         return node;
       }),
     );
-    console.log("selected node", props.selectedNode.id);
     
   }, [nodeName, props.setNodes]);
 

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { BaseEdge, EdgeLabelRenderer, getBezierPath, MarkerType } from '@xyflow/react';
+import ConnectorProperties from './connector-properties';
 
 const CustomEdge = ({
   id,
@@ -14,7 +15,8 @@ const CustomEdge = ({
   style = {},
   markerEnd,
   setEdges,
-  selected,
+  selectedEdge,
+  onEdgeClick
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editLabel, setEditLabel] = useState(label || '');
@@ -28,21 +30,6 @@ const CustomEdge = ({
     targetY,
     targetPosition,
   });
-
-  useEffect(()=>{
- console.log('CustomEdge props:', { markerEnd, style });
-  },[])
-
-
-  const handleDoubleClick = () => {
-    console.log("double clicked");
-    setIsEditing(true);
-    setEditLabel(label || '');
-  };
-
-  const handleLabelChange = (e) => {
-    setEditLabel(e.target.value);
-  };
 
   const handleLabelSubmit = () => {
     console.log("Submitting label:", editLabel, "for edge:", id);
@@ -58,22 +45,6 @@ const CustomEdge = ({
     setIsEditing(false);
   };
 
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter') {
-      handleLabelSubmit();
-    } else if (e.key === 'Escape') {
-      setIsEditing(false);
-      setEditLabel(label || '');
-    }
-  };
-
-  const handleAddLabel = () => {
-    console.log("inside add label");
-    console.log("setEdges available:", !!setEdges);
-    setIsEditing(true);
-    setEditLabel('');
-  };
-
   const handleDeleteEdge = () => {
     console.log("Deleting edge:", id);
     if (setEdges) {
@@ -83,104 +54,138 @@ const CustomEdge = ({
     }
   };
 
+  // Change line style
+  const changeLineStyle = (newStyle) => {
+    if (setEdges) {
+      setEdges((edges) =>
+        edges.map((edge) =>
+          edge.id === id ? { 
+            ...edge, 
+            data: { ...edge.data, lineType: newStyle } 
+          } : edge
+        )
+      );
+    }
+  };
+
+  // Change edge color
+  const changeEdgeColor = (newColor) => {
+    if (setEdges) {
+      setEdges((edges) =>
+        edges.map((edge) =>
+          edge.id === id ? { 
+            ...edge, 
+            data: { ...edge.data, edgeColor: newColor } 
+          } : edge
+        )
+      );
+    }
+  };
+
+  const getLineStyle = () => {
+    const lineType = data?.lineType || 'solid';
+    const edgeColor = data?.edgeColor || '#b1b1b7';
+    
+    const baseStyle = {
+      strokeWidth: 2,
+      stroke: edgeColor,
+      ...style,
+    };
+
+    switch (lineType) {
+      case 'dashed':
+        return { ...baseStyle, strokeDasharray: '5,5' };
+      case 'dotted':
+        return { ...baseStyle, strokeDasharray: '2,2' };
+      case 'dash-dot':
+        return { ...baseStyle, strokeDasharray: '5,2,2,2' };
+      case 'long-dash':
+        return { ...baseStyle, strokeDasharray: '10,5' };
+      default:
+        return baseStyle;
+    }
+  };
+
   return (
     <>
-      <BaseEdge 
+      {/* <BaseEdge 
         id={id} 
         path={edgePath} 
         onMouseEnter={() => setShowToolbar(true)}
         onMouseLeave={() => setShowToolbar(false)} 
-        markerEnd={markerEnd || { type: MarkerType.ArrowClosed }}  // Fallback if prop is missing
-  style={style || { strokeWidth: 1, stroke: '#b1b1b7' }} 
-      />
-            {(showToolbar || selected) && (
-        <EdgeLabelRenderer>
-          
-            {!label ? (
-              <button
-                onClick={handleAddLabel}
-                style={{
-                  background: '#007bff',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '4px',
-                  padding: '4px 8px',
-                  fontSize: '10px',
-                  cursor: 'pointer',
-                }}
-                title="Add Label"
-              >
-                + Label
-              </button>
-            ) : (
-              <button
-                onClick={handleDoubleClick}
-                style={{
-                  background: '#28a745',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '4px',
-                  padding: '4px 8px',
-                  fontSize: '10px',
-                  cursor: 'pointer',
-                }}
-                title="Edit Label"
-              >
-                ✏️ Edit
-              </button>
-            )}
-            
-           
-        </EdgeLabelRenderer>
-      )}
-      
-      <EdgeLabelRenderer>
-        {isEditing ? (
-          <input
-            type="text"
-            value={editLabel}
-            onChange={handleLabelChange}
-            onBlur={handleLabelSubmit}
-            onKeyPress={handleKeyPress}
+        markerEnd={markerEnd}
+        style={getLineStyle()}
+      /> */}
+
+       <svg
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          pointerEvents: 'none',
+          zIndex: 1,
+        }}
+          onClick={()=>onEdgeClick(selectedEdge?.id, "", selectedEdge?.label)}
+      >
+        <defs>
+          <marker
+            id={`arrow-${id}`}
+            markerWidth="10"
+            markerHeight="10"
+            refX="9"
+            refY="3"
+            orient="auto"
+            markerUnits="strokeWidth"
+          >
+            <polygon
+              points="0,0 0,6 9,3"
+              fill={getLineStyle().stroke}
+            />
+          </marker>
+        </defs>
+        
+        <path
+          d={edgePath}
+          stroke={getLineStyle().stroke}
+          strokeWidth={getLineStyle().strokeWidth}
+          fill="none"
+          markerEnd={`url(#arrow-${id})`}
+          style={{
+            pointerEvents: 'all',
+            cursor: 'pointer',
+          }}
+        
+        />
+      </svg>
+       <EdgeLabelRenderer>
+        {/* Show the label if it exists */}
+        {selectedEdge.label && (
+          <div
             style={{
               position: 'absolute',
               transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
               pointerEvents: 'all',
-              border: '1px solid #007bff',
-              borderRadius: '4px',
-              padding: '4px 8px',
-              fontSize: '12px',
-              minWidth: '80px',
               backgroundColor: 'white',
-              zIndex: 1001,
+              padding: '4px 8px',
+              borderRadius: '4px',
+              border: '1px solid #ccc',
+              fontSize: '12px',
+              minWidth: '60px',
+              textAlign: 'center',
+              boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+              cursor: 'pointer',
+              zIndex: 1000,
             }}
             className="nodrag nopan"
-            autoFocus
-            placeholder="Enter label..."
-          />
-        ) : (
-          label && (
-            <div
-              style={{
-                position: 'absolute',
-                transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
-                pointerEvents: 'all',
-                backgroundColor: 'white',
-                padding: '4px 8px',
-                borderRadius: '4px',
-                border: '1px solid #ccc',
-                fontSize: '12px',
-                minWidth: '60px',
-                textAlign: 'center',
-                boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-              }}
-              className="nodrag nopan"
-            >
-              {label}
-            </div>
-          )
+            onClick={()=>onEdgeClick(selectedEdge.id, "", selectedEdge.label)}
+            title="Double-click to edit"
+          >
+            {selectedEdge.label}
+          </div>
         )}
-      </EdgeLabelRenderer>
+        </EdgeLabelRenderer> 
     </>
   );
 };

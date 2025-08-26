@@ -18,6 +18,7 @@ import CircleNode from './components/circle-node';
 import DiamondNode from './components/diamond-node';
 import RectangleNode from './components/reactangle-node';
 import NodeWithToolbar from './components/node-toolbar';
+import ConnectorProperties from './components/connector-properties';
 
 const defaultViewport = { x: 0, y: 0, zoom: 1.5 };
 
@@ -38,6 +39,8 @@ const FlowComponent = () => {
   const [edges, setEdges] = useState(initialEdges);
   const [showUpdatePanel, setShowUpdatePanel] = useState(false);
   const [selectedNode, setSelectedNode] = useState(null);
+  const [showEdgePanel, setShowEdgePanel] = useState(false);
+  const [selectedEdge, setSelectedEdge] = useState(null);
   const reactFlowWrapper = useRef(null);
   const { getViewport } = useReactFlow();
 
@@ -80,12 +83,15 @@ const handleUpdateNode = (nodeId, nodeData) => {
   );
 
    const onConnect = useCallback(
-    (connection) => {
-      const edge = { ...connection};
-      setEdges((eds) => addEdge(edge, eds));
-    },
-    [setEdges],
-  );
+  (connection) => {
+    const edge = { 
+      ...connection, 
+      type: 'custom-edge',
+    };
+    setEdges((eds) => addEdge(edge, eds));
+  },
+  [setEdges],
+);
  
   const onDragOver = useCallback((event) => {
     event.preventDefault();
@@ -126,16 +132,26 @@ const handleUpdateNode = (nodeId, nodeData) => {
 );
    const edgeTypes = {
   'custom-edge': (props) => (
-      <CustomEdge {...props} setEdges={setEdges} markerEnd={{
+    <CustomEdge 
+      {...props} 
+      setEdges={setEdges} 
+      markerEnd={{
         type: MarkerType.ArrowClosed,
       }}
       style={{
-        strokeWidth: 1,
+        strokeWidth: 2,
         stroke: '#b1b1b7',
-      }} />
-      
-    ),
+      }} 
+      onEdgeClick={handleEdgeClick}
+       selectedEdge={selectedEdge}
+    />
+  ),
 };
+
+   const handleEdgeClick = (edgeId, edgeData, edgeLabel) => {
+    setSelectedEdge({ id: edgeId, data: edgeData, label: edgeLabel });
+    setShowEdgePanel(true);
+  };
 
   return (
     <div style={{ height: '100vh', width: '100%', display: 'flex' }}>
@@ -157,15 +173,15 @@ const handleUpdateNode = (nodeId, nodeData) => {
         attributionPosition="bottom-left"
         fitView
         fitViewOptions={{ padding: 0.5 }}
-        defaultEdgeOptions={{
-    markerEnd: {
-      type: MarkerType.ArrowClosed,
-    },
-    style: {
-      strokeWidth: 1,
-      stroke: '#b1b1b7',
-    },
-  }}
+  //       defaultEdgeOptions={{
+  //   markerEnd: {
+  //     type: MarkerType.ArrowClosed,
+  //   },
+  //   style: {
+  //     strokeWidth: 1,
+  //     stroke: '#b1b1b7',
+  //   },
+  // }}
       >
         <Background />
       </ReactFlow>
@@ -210,6 +226,35 @@ const handleUpdateNode = (nodeId, nodeData) => {
             />
           </div>
         )}
+        {showEdgePanel && selectedEdge && (
+        <div style={{
+          width: '300px',
+          backgroundColor: '#f8f9fa',
+          borderLeft: '1px solid #dee2e6',
+          padding: '20px',
+          overflowY: 'auto'
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+            <h3 style={{ margin: 0, color: '#495057' }}>Edge Properties</h3>
+            <button
+              onClick={() => setShowEdgePanel(false)}
+              style={{
+                background: 'none',
+                border: 'none',
+                fontSize: '18px',
+                cursor: 'pointer',
+                color: '#6c757d'
+              }}
+            >
+              ×
+            </button>
+          </div>
+          <ConnectorProperties setSelectedEdge={setSelectedEdge} 
+              setEdges={setEdges}
+              selectedEdge={selectedEdge}/>
+          
+        </div>
+      )}
     </div>
   );
 };
