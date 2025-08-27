@@ -14,11 +14,9 @@ import '@xyflow/react/dist/style.css';
 import NodePalette from './components/node-palette';
 import CustomEdge from './components/custom-edge';
 import UpdateNode from './components/update-node';
-import CircleNode from './components/circle-node';
-import DiamondNode from './components/diamond-node';
-import RectangleNode from './components/reactangle-node';
 import NodeWithToolbar from './components/node-toolbar';
 import ConnectorProperties from './components/connector-properties';
+import ShapeNode from './components/shape-node';
 
 const defaultViewport = { x: 0, y: 0, zoom: 1.5 };
 
@@ -44,15 +42,24 @@ const FlowComponent = () => {
   const reactFlowWrapper = useRef(null);
   const { getViewport } = useReactFlow();
 
-  const nodeTypes = {
-  circle: CircleNode,
-  diamond: DiamondNode,
-  rectangle: RectangleNode,
+const nodeTypes = {
+  'shape': (props) => (
+    <ShapeNode 
+      {...props} 
+      setEdges={setEdges} 
+      setNodes={setNodes}
+      onUpdateNode={handleUpdateNode}
+    />
+  ),
   'node-with-toolbar': (props) => (
-    <NodeWithToolbar {...props} setEdges={setEdges} setNodes={setNodes} onUpdateNode={handleUpdateNode} selectedNode={selectedNode}/>
+    <NodeWithToolbar 
+      {...props} 
+      setEdges={setEdges} 
+      setNodes={setNodes}
+      onUpdateNode={handleUpdateNode}
+    />
   ),
 };
-
 useEffect(() => {
     const originalError = console.error;
     console.error = (...args) => {
@@ -98,14 +105,16 @@ const handleUpdateNode = (nodeId, nodeData) => {
     event.preventDefault();
     event.dataTransfer.dropEffect = 'move';
   }, []);
- 
+
  const onDrop = useCallback(
   (event) => {
     event.preventDefault();
 
     const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
     const type = event.dataTransfer.getData('application/reactflow');
+    const shapeType = event.dataTransfer.getData('application/reactflow-shape');
     const label = event.dataTransfer.getData('application/reactflow-label');
+    const color = event.dataTransfer.getData('application/reactflow-color');
 
     if (typeof type === 'undefined' || !type) {
       return;
@@ -118,19 +127,20 @@ const handleUpdateNode = (nodeId, nodeData) => {
     };
 
     const newNode = {
-      id: `${nodeId++}`,
-      type: 'node-with-toolbar',
+      id: `${type}-${Date.now()}`,
+      type: type,
       position,
       data: { 
-        label,
-        originalType: type,
-        nodeType: type
+        type: shapeType,
+        label: '', 
+        color: color || '#7f8c8d'
       },
     };
     setNodes((nds) => nds.concat(newNode));
   },
-  [getViewport],
+  [getViewport, setNodes],
 );
+
    const edgeTypes = {
   'custom-edge': (props) => (
     <CustomEdge 

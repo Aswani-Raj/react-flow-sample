@@ -132,7 +132,7 @@ const CustomEdge = ({
 </svg>
 
        <EdgeLabelRenderer>
-        {selectedEdge.label && (
+        {selectedEdge?.label && (
           <div
             style={{
               position: 'absolute',

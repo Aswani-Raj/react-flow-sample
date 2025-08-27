@@ -4,8 +4,8 @@ const CircleNode = ({ data }) => {
   return (
     <div
       style={{
-        width: '80px',
-        height: '80px',
+        width: '40px',
+        height: '40px',
         borderRadius: '50%',
         // backgroundColor: '#ff6b6b',
         border: '2px solid #ff5252',

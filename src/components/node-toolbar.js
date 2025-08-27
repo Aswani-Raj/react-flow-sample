@@ -21,7 +21,7 @@ function NodeWithToolbar(props) {
       fontSize: '12px',
       color: 'white',
       textAlign: 'center',
-      border: props.selected ? '2px solid #ff0066' : '1px solid #b30000',
+      border: props.selected ? '2px solid #ff0066' : '1px solid black',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
@@ -36,7 +36,7 @@ function NodeWithToolbar(props) {
           height: '80px',
           borderRadius: '50%',
         //   backgroundColor: '#ff6b6b',
-          border: props.selected ? '2px solid #ff5252' : '2px solid #ff5252'
+          border: props.selected ? '2px solid #ff5252' : '1px solid #ff5252'
         };
       case 'diamond':
         return { 
@@ -44,7 +44,7 @@ function NodeWithToolbar(props) {
           width: '80px',
           height: '80px',
         //   backgroundColor: '#4ecdc4',
-          border: props.selected ? '2px solid #45b7aa' : '2px solid #45b7aa',
+          border: props.selected ? '2px solid #45b7aa' : '1px solid #45b7aa',
           transform: 'rotate(45deg)'
         };
       case 'rectangle':
@@ -54,7 +54,7 @@ function NodeWithToolbar(props) {
           height: '60px',
           borderRadius: '8px',
         //   backgroundColor: '#95a5a6',
-          border: props.selected ? '2px solid #7f8c8d' : '2px solid #7f8c8d'
+          border: props.selected ? '2px solid #7f8c8d' : '1px solid #7f8c8d'
         };
       default:
         return { 
