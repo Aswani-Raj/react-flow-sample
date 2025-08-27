@@ -6,13 +6,13 @@ const ShapeNode = ({ id,data, selected, setEdges, setNodes, onUpdateNode }) => {
  const getDefaultDimensions = (shapeType) => {
     switch (shapeType) {
       case 'circle':
-        return { width: 80, height: 80 };
+        return { width: 40, height: 40 };
       case 'diamond':
-        return { width: 80, height: 80 };
+        return { width: 40, height: 40 };
       case 'rectangle':
-        return { width: 120, height: 60 };
+        return { width: 60, height: 30 };
       case 'round-rectangle':
-        return { width: 120, height: 60 };
+        return { width: 60, height: 30 };
       default:
         return { width: 120, height: 60 };
     }
@@ -207,20 +207,28 @@ const ShapeNode = ({ id,data, selected, setEdges, setNodes, onUpdateNode }) => {
         type="target"
         position="top"
         style={{ 
-          background: "grey",
-          top: type === 'diamond' ? '-20px' : '-1px',
-          left: type === 'circle' ? '50%' : '50%',
-          transform: 'translateX(-50%)',
+        background: "grey",
+        top: type === 'diamond' ? '-10px' : '-1px',
+        left: type === 'circle' ? '50%' : '50%',
+        transform: 'translateX(-50%)',
+        minWidth: "0px",
+        minHeight: "0px",
+        width: "2px",
+        height: "2px"
         }}
       />
       <Handle
         type="source"
         position="bottom"
         style={{ 
-          background: "grey",
-          bottom: type === 'diamond' ? '-20px' : '-1px',
-          left: type === 'circle' ? '50%' : '50%',
-          transform: 'translateX(-50%)',
+        background: "grey",
+        bottom: type === 'diamond' ? '-10px' : '-1px',
+        left: type === 'circle' ? '50%' : '50%',
+        transform: 'translateX(-50%)',
+        minWidth: "0px",
+        minHeight: "0px",
+        width: "2px",
+        height: "2px"
         }}
       />
     </div>

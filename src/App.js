@@ -10,6 +10,7 @@ import {
   useReactFlow,
   MarkerType,
   Panel,
+  Controls 
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import NodePalette from './components/node-palette';
@@ -24,16 +25,14 @@ const flowKey = 'example-flow';
 
 
 const initialNodes = [
-  {
-    id: '1',
-    position: { x: 100, y: 100 },
-    data: { label: 'Start' },
-    type: 'node-with-toolbar'  },
+  // {
+  //   id: '1',
+  //   position: { x: 100, y: 100 },
+  //   data: { label: 'Start' },
+  //   type: 'node-with-toolbar'  },
 ];
 
 const initialEdges = [];
-
-let nodeId = 2;
 
 const FlowComponent = () => {
   const [nodes, setNodes] = useState(initialNodes);
@@ -146,6 +145,10 @@ const handleUpdateNode = (nodeId, nodeData) => {
   [getViewport, setNodes],
 );
 
+const closeNodePanel =(flag)=>{
+ setShowUpdatePanel(flag)
+}
+
    const edgeTypes = {
   'custom-edge': (props) => (
     <CustomEdge 
@@ -232,6 +235,8 @@ const onSave = useCallback(() => {
           Restore
         </button>
       </Panel>
+       <MiniMap nodeStrokeWidth={3} />
+       <Controls />
       </ReactFlow>
       </div>
       {showUpdatePanel && selectedNode && (
@@ -243,34 +248,11 @@ const onSave = useCallback(() => {
             overflowY: 'auto',
             boxShadow: '-2px 0 5px rgba(0,0,0,0.1)'
           }}>
-            <div style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              marginBottom: '20px',
-              borderBottom: '1px solid #eee',
-              paddingBottom: '10px'
-            }}>
-              <h3>Update Node: {selectedNode.id}</h3>
-              <button
-                onClick={() => setShowUpdatePanel(false)}
-                style={{
-                  background: '#dc3545',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '4px',
-                  padding: '8px 12px',
-                  cursor: 'pointer'
-                }}
-              >
-                ✕
-              </button>
-            </div>
-            
             <UpdateNode 
               setNodes={setNodes} 
               setEdges={setEdges}
               selectedNode={selectedNode}
+              closeNodePanel={closeNodePanel}
             />
           </div>
         )}
