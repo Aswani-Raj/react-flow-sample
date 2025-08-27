@@ -1,9 +1,19 @@
-import React, { useState } from 'react';
-import { Handle, NodeToolbar } from '@xyflow/react';
+import React, { useEffect, useState } from 'react';
+import { Handle, NodeResizer, NodeToolbar } from '@xyflow/react';
 
 const ShapeNode = ({ id,data, selected, setEdges, setNodes, onUpdateNode }) => {
   const [showToolbar, setShowToolbar] = useState(false);
+const [dimensions, setDimensions] = useState({
+    width: data.width || 120,
+    height: data.height || 60
+  });
   const { type = 'rectangle', color = '#7f8c8d' } = data;
+
+  useEffect(() => {
+    if (data.width && data.height) {
+      setDimensions({ width: data.width, height: data.height });
+    }
+  }, [data.width, data.height]);
 
   const handleUpdateNode = () => {    
     if (onUpdateNode) {
@@ -13,8 +23,8 @@ const ShapeNode = ({ id,data, selected, setEdges, setNodes, onUpdateNode }) => {
 
   const renderShape = () => {
     const baseStyle = {
-      width: '120px',
-      height: '60px',
+      width: `${dimensions.width}px`,  // Use dimensions from state
+      height: `${dimensions.height}px`,
       backgroundColor: 'white',
       border: `1px solid black`,
       display: 'flex',
@@ -134,8 +144,12 @@ const ShapeNode = ({ id,data, selected, setEdges, setNodes, onUpdateNode }) => {
         </NodeToolbar>
       )}
 
-      {/* Connection handles - positioned relative to the shape */}
-      <Handle
+<NodeResizer
+        color="blue"
+        isVisible={selected}
+        // minWidth={100}
+        // minHeight={30}
+      >      <Handle
         type="target"
         position="top"
         style={{ 
@@ -155,6 +169,7 @@ const ShapeNode = ({ id,data, selected, setEdges, setNodes, onUpdateNode }) => {
           transform: 'translateX(-50%)',
         }}
       />
+      </NodeResizer>
     </div>
   );
 };
