@@ -202,12 +202,12 @@ const ShapeNode = ({ id,data, selected, setEdges, setNodes, onUpdateNode }) => {
         height={dimensions.height} 
         onResize={handleResize}     
         onResizeEnd={handleResizeEnd} 
-      >      
+      />      
       <Handle
         type="target"
         position="top"
         style={{ 
-          background: "black",
+          background: "grey",
           top: type === 'diamond' ? '-20px' : '-1px',
           left: type === 'circle' ? '50%' : '50%',
           transform: 'translateX(-50%)',
@@ -217,13 +217,12 @@ const ShapeNode = ({ id,data, selected, setEdges, setNodes, onUpdateNode }) => {
         type="source"
         position="bottom"
         style={{ 
-          background: "black",
+          background: "grey",
           bottom: type === 'diamond' ? '-20px' : '-1px',
           left: type === 'circle' ? '50%' : '50%',
           transform: 'translateX(-50%)',
         }}
       />
-      </NodeResizer>
     </div>
   );
 };

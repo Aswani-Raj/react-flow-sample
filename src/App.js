@@ -9,6 +9,7 @@ import {
   ReactFlowProvider,
   useReactFlow,
   MarkerType,
+  Panel,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import NodePalette from './components/node-palette';
@@ -19,6 +20,8 @@ import ConnectorProperties from './components/connector-properties';
 import ShapeNode from './components/shape-node';
 
 const defaultViewport = { x: 0, y: 0, zoom: 1.5 };
+const flowKey = 'example-flow';
+
 
 const initialNodes = [
   {
@@ -40,6 +43,8 @@ const FlowComponent = () => {
   const [showEdgePanel, setShowEdgePanel] = useState(false);
   const [selectedEdge, setSelectedEdge] = useState(null);
   const reactFlowWrapper = useRef(null);
+  const [rfInstance, setRfInstance] = useState(null);
+  const { setViewport } = useReactFlow();
   const { getViewport } = useReactFlow();
 
 const nodeTypes = {
@@ -159,6 +164,28 @@ const handleUpdateNode = (nodeId, nodeData) => {
   ),
 };
 
+const onSave = useCallback(() => {
+    if (rfInstance) {
+      const flow = rfInstance.toObject();
+      localStorage.setItem(flowKey, JSON.stringify(flow));
+    }
+  }, [rfInstance]);
+
+  const onRestore = useCallback(() => {
+    const restoreFlow = async () => {
+      const flow = JSON.parse(localStorage.getItem(flowKey));
+
+      if (flow) {
+        const { x = 0, y = 0, zoom = 1 } = flow.viewport;
+        setNodes(flow.nodes || []);
+        setEdges(flow.edges || []);
+        setViewport({ x, y, zoom });
+      }
+    };
+
+    restoreFlow();
+  }, [setNodes, setViewport]);
+
    const handleEdgeClick = (edgeId, edgeData, edgeLabel) => {
     setSelectedEdge({ id: edgeId, data: edgeData, label: edgeLabel });
     setShowEdgePanel(true);
@@ -184,6 +211,8 @@ const handleUpdateNode = (nodeId, nodeData) => {
         attributionPosition="bottom-left"
         fitView
         fitViewOptions={{ padding: 0.5 }}
+              onInit={setRfInstance}
+
   //       defaultEdgeOptions={{
   //   markerEnd: {
   //     type: MarkerType.ArrowClosed,
@@ -195,6 +224,14 @@ const handleUpdateNode = (nodeId, nodeData) => {
   // }}
       >
         <Background />
+        <Panel position="top-right">
+        <button className="primary" onClick={onSave}>
+          Save
+        </button>
+        <button className="primary" onClick={onRestore}>
+          Restore
+        </button>
+      </Panel>
       </ReactFlow>
       </div>
       {showUpdatePanel && selectedNode && (
