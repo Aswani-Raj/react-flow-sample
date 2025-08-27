@@ -3,10 +3,28 @@ import { Handle, NodeResizer, NodeToolbar } from '@xyflow/react';
 
 const ShapeNode = ({ id,data, selected, setEdges, setNodes, onUpdateNode }) => {
   const [showToolbar, setShowToolbar] = useState(false);
-const [dimensions, setDimensions] = useState({
-    width: data.width || 120,
-    height: data.height || 60
+ const getDefaultDimensions = (shapeType) => {
+    switch (shapeType) {
+      case 'circle':
+        return { width: 80, height: 80 };
+      case 'diamond':
+        return { width: 80, height: 80 };
+      case 'rectangle':
+        return { width: 120, height: 60 };
+      case 'round-rectangle':
+        return { width: 120, height: 60 };
+      default:
+        return { width: 120, height: 60 };
+    }
+  };
+
+  const [dimensions, setDimensions] = useState(() => {
+    if (data.width && data.height) {
+      return { width: data.width, height: data.height };
+    }
+    return getDefaultDimensions(data.type || 'rectangle');
   });
+
   const { type = 'rectangle', color = '#7f8c8d' } = data;
 
   useEffect(() => {
@@ -20,10 +38,42 @@ const [dimensions, setDimensions] = useState({
       onUpdateNode(id, data);
     }
   };
+   const handleResize = (event, params) => {
+    setDimensions({
+      width: params.width,
+      height: params.height
+    });
+  };
+
+  const handleResizeEnd = (event, params) => {
+    const newDimensions = {
+      width: params.width,
+      height: params.height
+    };
+    
+    setDimensions(newDimensions);
+    
+    if (setNodes) {
+      setNodes((nodes) =>
+        nodes.map((node) =>
+          node.id === id
+            ? {
+                ...node,
+                data: {
+                  ...node.data,
+                  width: newDimensions.width,
+                  height: newDimensions.height
+                }
+              }
+            : node
+        )
+      );
+    }
+  };
 
   const renderShape = () => {
     const baseStyle = {
-      width: `${dimensions.width}px`,  // Use dimensions from state
+      width: `${dimensions.width}px`,
       height: `${dimensions.height}px`,
       backgroundColor: 'white',
       border: `1px solid black`,
@@ -41,26 +91,25 @@ const [dimensions, setDimensions] = useState({
       case 'round-rectangle':
         return {
           ...baseStyle,
-          borderRadius: '30px', // Rounded corners
+          borderRadius: '30px', 
         };
       case 'rectangle':
         return {
           ...baseStyle,
-          borderRadius: '8px', // Slightly rounded corners
         };
       case 'circle':
         return {
           ...baseStyle,
-          width: '80px',
-          height: '80px',
-          borderRadius: '50%', // Perfect circle
+        //   width: '80px',
+        //   height: '80px',
+          borderRadius: '50%',
         };
       case 'diamond':
         return {
           ...baseStyle,
-          width: '80px',
-          height: '80px',
-          transform: 'rotate(45deg)', // Rotate to create diamond
+        //   width: '80px',
+        //   height: '80px',
+          transform: 'rotate(45deg)',
         };
       default:
         return baseStyle;
@@ -149,7 +198,12 @@ const [dimensions, setDimensions] = useState({
         isVisible={selected}
         // minWidth={100}
         // minHeight={30}
-      >      <Handle
+        width={dimensions.width}
+        height={dimensions.height} 
+        onResize={handleResize}     
+        onResizeEnd={handleResizeEnd} 
+      >      
+      <Handle
         type="target"
         position="top"
         style={{ 
