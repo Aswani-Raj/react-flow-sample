@@ -3,30 +3,44 @@ import { Panel } from '@xyflow/react';
 
 const UpdateNode = ({ selectedNode, onClose, setNodes, closeNodePanel }) => {
   const [label, setLabel] = useState('');
-  const [nodeType, setNodeType] = useState(''); // Add this for dropdown
-  const [nodeStatus, setNodeStatus] = useState(''); // Add this for status dropdown
+  const [nodeType, setNodeType] = useState('');
+  const [nodeStatus, setNodeStatus] = useState('');
+  const [nodeHidden, setNodeHidden] = useState(false);
+  const [nodeName, setNodeName] = useState('');
+  const [nodeBg, setNodeBg] = useState('#dbdbdb');
 
   useEffect(() => {
     if (selectedNode) {
       setLabel(selectedNode.data?.label || '');
-      setNodeType(selectedNode.data?.nodeType || ''); // Restore saved nodeType
-      setNodeStatus(selectedNode.data?.nodeStatus || ''); // Restore saved status
+      setNodeType(selectedNode.data?.nodeType || '');
+      setNodeStatus(selectedNode.data?.nodeStatus || '');
+      setNodeHidden(selectedNode.data?.hidden || false);
+      setNodeName(selectedNode.data?.name || '');
+      setNodeBg(selectedNode.data?.backgroundColor || '#dbdbdb');
     }
   }, [selectedNode]);
 
   const handleSave = () => {
-    if (selectedNode && setNodes) {
+    if (selectedNode) {
+      console.log("nodeeee", selectedNode, nodeBg);
+      
       setNodes((nodes) =>
         nodes.map((node) =>
           node.id === selectedNode.id
             ? {
                 ...node,
+                hidden: nodeHidden,
                 data: {
                   ...node.data,
                   label: label,
                   nodeType: nodeType,
                   nodeStatus: nodeStatus,
+                  backgroundColor: nodeBg,
                 },
+                style: {
+                  ...node.style,
+                  backgroundColor: nodeBg,
+                }
               }
             : node
         )
@@ -57,6 +71,17 @@ const UpdateNode = ({ selectedNode, onClose, setNodes, closeNodePanel }) => {
           }}
         />
       </div>
+      <label className="xy-theme__label">Label: </label><input
+          value={nodeName}
+          onChange={(evt) => setNodeName(evt.target.value)}
+          className="xy-theme__input" /><label className="xy-theme__label">Background: </label><input
+            value={nodeBg}
+              onChange={(evt) => setNodeBg(evt.target.value)}
+              className="xy-theme__input" /><label className="xy-theme__label">Hidden:</label><input
+              type="checkbox"
+              checked={nodeHidden}
+              onChange={(evt) => setNodeHidden(evt.target.checked)}
+              className="xy-theme__checkbox" />
 
       {/* Node Type Dropdown */}
       <div style={{ marginBottom: '15px' }}>

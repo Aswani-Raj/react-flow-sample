@@ -1,17 +1,10 @@
-const ConnectorProperties = (props) => {
-    console.log("selected Edge", props.selectedEdge);
-    
+const ConnectorProperties = (props) => {    
     const updateEdgeData = (newData) => {
-        console.log("new data", newData, props.selectedEdge);
         
         if (props.selectedEdge?.id && props.setEdges) {
-            // Get the current edge data from the edges state, not from props
             props.setEdges(edges => {
                 const currentEdge = edges.find(edge => edge.id === props.selectedEdge.id);
                 const currentData = currentEdge?.data || {};
-                
-                console.log("Current edge data:", currentData);
-                console.log("New data to merge:", newData);
                 
                 const updatedEdges = edges.map(edge => 
                     edge.id === props.selectedEdge.id 
@@ -22,21 +15,16 @@ const ConnectorProperties = (props) => {
                         : edge
                 );
                 
-                console.log("Updated edges:", updatedEdges);
                 return updatedEdges;
             });
             
-            // Also update the local selectedEdge state to reflect the change
             props.setSelectedEdge(prev => ({
                 ...prev,
                 data: { ...prev.data, ...newData }
             }));
-        } else {
-            console.error("Cannot update edge: ID is undefined or setEdges not available");
-        }
+        } 
     };
 
-    // Get the current edge data for display
     const edgeData = props.selectedEdge?.data || {};
 
     return (
@@ -47,27 +35,13 @@ const ConnectorProperties = (props) => {
             padding: '20px',
             overflowY: 'auto'
         }}>
-            {/* <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                <h3 style={{ margin: 0, color: '#495057' }}>Edge Properties</h3>
-                <button
-                    onClick={() => props.setShowEdgePanel(false)}
-                    style={{
-                        background: 'none',
-                        border: 'none',
-                        fontSize: '18px',
-                        cursor: 'pointer',
-                        color: '#6c757d'
-                    }}
-                >
-                    ×
-                </button>
-            </div> */}
             
+{/*             
             <div style={{ marginBottom: '20px' }}>
                 <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold', color: '#495057' }}>
                     Edge ID: {props.selectedEdge?.id}
                 </label>
-            </div>
+            </div> */}
 
             <div style={{ marginBottom: '20px' }}>
                 <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold', color: '#495057' }}>
@@ -106,7 +80,6 @@ const ConnectorProperties = (props) => {
                         <button
                             key={style}
                             onClick={() => {
-                                console.log("Setting line style:", style);
                                 updateEdgeData({ lineType: style });
                             }}
                             style={{
@@ -134,7 +107,6 @@ const ConnectorProperties = (props) => {
                         <button
                             key={color}
                             onClick={() => {
-                                console.log("Setting edge color:", color);
                                 updateEdgeData({ edgeColor: color });
                             }}
                             style={{

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Handle, NodeResizer, NodeToolbar } from '@xyflow/react';
 
-const ShapeNode = ({ id,data, selected, setEdges, setNodes, onUpdateNode }) => {
+const ShapeNode = ({ id,data, selected, setEdges, setNodes, onUpdateNode,clickNode }) => {
   const [showToolbar, setShowToolbar] = useState(false);
  const getDefaultDimensions = (shapeType) => {
     switch (shapeType) {
@@ -25,7 +25,8 @@ const ShapeNode = ({ id,data, selected, setEdges, setNodes, onUpdateNode }) => {
     return getDefaultDimensions(data.type || 'rectangle');
   });
 
-  const { type = 'rectangle', color = '#7f8c8d' } = data;
+  const { type = 'rectangle', color = '#7f8c8d' } = data;  
+  const backgroundColor = data.backgroundColor || 'white';
 
   useEffect(() => {
     if (data.width && data.height) {
@@ -75,7 +76,7 @@ const ShapeNode = ({ id,data, selected, setEdges, setNodes, onUpdateNode }) => {
     const baseStyle = {
       width: `${dimensions.width}px`,
       height: `${dimensions.height}px`,
-      backgroundColor: 'white',
+      backgroundColor: backgroundColor,
       border: `1px solid black`,
       display: 'flex',
       alignItems: 'center',
@@ -86,7 +87,6 @@ const ShapeNode = ({ id,data, selected, setEdges, setNodes, onUpdateNode }) => {
       textAlign: 'center',
       position: 'relative',
     };
-
     switch (type) {
       case 'round-rectangle':
         return {
@@ -128,6 +128,7 @@ const ShapeNode = ({ id,data, selected, setEdges, setNodes, onUpdateNode }) => {
       }}
       onMouseEnter={() => setShowToolbar(true)}
       onMouseLeave={() => setShowToolbar(false)}
+      onClick={() => clickNode(id,data)}
     >
       <div style={shapeStyle}>
         <div 

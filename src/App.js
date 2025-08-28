@@ -53,6 +53,7 @@ const nodeTypes = {
       setEdges={setEdges} 
       setNodes={setNodes}
       onUpdateNode={handleUpdateNode}
+      clickNode={handleNodeClick}
     />
   ),
   'node-with-toolbar': (props) => (
@@ -79,6 +80,11 @@ useEffect(() => {
   }, []);
 
 const handleUpdateNode = (nodeId, nodeData) => {
+    setSelectedNode({ id: nodeId, data: nodeData });
+    setShowUpdatePanel(true);
+  };
+
+  const handleNodeClick = (nodeId, nodeData) => {    
     setSelectedNode({ id: nodeId, data: nodeData });
     setShowUpdatePanel(true);
   };
@@ -195,26 +201,28 @@ const onSave = useCallback(() => {
   };
 
   return (
-    <div style={{ height: '100vh', width: '100%', display: 'flex' }}>
-      <NodePalette/>
-      <div style={{ flex: 1, height: '100%' }} ref={reactFlowWrapper}>
-      <ReactFlow
-        nodes={nodes}
-        edges={edges}
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
-        onConnect={onConnect}
-        onDragOver={onDragOver}
-        onDrop={onDrop}
-        nodeTypes={nodeTypes}
-        edgeTypes={edgeTypes}
-        defaultViewport={defaultViewport}
-        minZoom={0.2}
-        maxZoom={4}
-        attributionPosition="bottom-left"
-        fitView
-        fitViewOptions={{ padding: 0.5 }}
-              onInit={setRfInstance}
+         <div style={{ height: '100vh', width: '100%', display: 'flex' }}>
+       <NodePalette/>
+       <div style={{ flex: 1, height: '100%', overflow: 'auto'}} ref={reactFlowWrapper}>
+               <ReactFlow
+          nodes={nodes}
+          edges={edges}
+          onNodesChange={onNodesChange}
+          onEdgesChange={onEdgesChange}
+          onConnect={onConnect}
+          onDragOver={onDragOver}
+          onDrop={onDrop}
+          nodeTypes={nodeTypes}
+          edgeTypes={edgeTypes}
+          defaultViewport={defaultViewport}
+          minZoom={0.2}
+          maxZoom={4}
+          attributionPosition="bottom-left"
+          // fitView
+          fitViewOptions={{ padding: 0.5 }}
+          onInit={setRfInstance}
+          style={{ width: '100%', height: '100%' }}
+          className="custom-react-flow"
 
   //       defaultEdgeOptions={{
   //   markerEnd: {

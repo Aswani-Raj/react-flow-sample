@@ -36,3 +36,38 @@
     transform: rotate(360deg);
   }
 }
+
+.react-flow {
+  overflow-y: auto !important;
+  overflow-x: auto !important;
+}
+
+/* Alternative selector if the above doesn't work */
+[data-testid="rf__wrapper"] {
+  overflow-y: auto !important;
+  overflow-x: auto !important;
+}
+
+/* Target the wrapper class that ReactFlow uses */
+.react-flow__wrapper {
+  overflow-y: auto !important;
+  overflow-x: auto !important;
+}
+
+/* Target the pane container */
+.react-flow__pane {
+  overflow-y: auto !important;
+  overflow-x: auto !important;
+}
+
+/* Target the viewport */
+.react-flow__viewport {
+  overflow-y: auto !important;
+  overflow-x: auto !important;
+}
+
+/* Target the main container */
+.react-flow__container {
+  overflow-y: auto !important;
+  overflow-x: auto !important;
+}

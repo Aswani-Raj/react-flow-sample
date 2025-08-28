@@ -11,3 +11,45 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+/* Force ReactFlow to show scrollbars */
+[data-testid="rf__wrapper"] {
+  overflow-y: auto !important;
+  overflow-x: auto !important;
+}
+
+.react-flow__wrapper {
+  overflow-y: auto !important;
+  overflow-x: auto !important;
+}
+
+.react-flow__pane {
+  overflow-y: auto !important;
+  overflow-x: auto !important;
+}
+
+.react-flow__viewport {
+  overflow-y: auto !important;
+  overflow-x: auto !important;
+}
+
+.react-flow__container {
+  overflow-y: auto !important;
+  overflow-x: auto !important;
+}
+
+/* Custom class for ReactFlow */
+.custom-react-flow {
+  overflow-y: auto !important;
+  overflow-x: auto !important;
+}
+
+.custom-react-flow .react-flow__wrapper {
+  overflow-y: auto !important;
+  overflow-x: auto !important;
+}
+
+.custom-react-flow [data-testid="rf__wrapper"] {
+  overflow-y: auto !important;
+  overflow-x: auto !important;
+}
