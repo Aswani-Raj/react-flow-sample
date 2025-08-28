@@ -76,7 +76,7 @@ const ConnectorProperties = (props) => {
                     Line Style:
                 </label>
                 <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                    {['solid', 'dashed', 'dotted'].map((style) => (
+                    {['Solid', 'Dashed', 'Dotted'].map((style) => (
                         <button
                             key={style}
                             onClick={() => {
