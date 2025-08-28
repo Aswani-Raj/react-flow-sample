@@ -77,7 +77,7 @@ const ShapeNode = ({ id,data, selected, setEdges, setNodes, onUpdateNode,clickNo
       width: `${dimensions.width}px`,
       height: `${dimensions.height}px`,
       border: `1px solid black`,
-      backgroundColor: color,
+      backgroundColor: backgroundColor,
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',

@@ -98,7 +98,7 @@ const ConnectorProperties = (props) => {
                 </div>
             </div>
 
-            <div style={{ marginBottom: '20px' }}>
+            {/* <div style={{ marginBottom: '20px' }}>
                 <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold', color: '#495057' }}>
                     Edge Color:
                 </label>
@@ -121,7 +121,7 @@ const ConnectorProperties = (props) => {
                         />
                     ))}
                 </div>
-            </div>
+            </div> */}
 
             <button
                 onClick={() => {

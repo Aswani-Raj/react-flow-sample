@@ -131,13 +131,9 @@ const CustomEdge = ({
               transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
               pointerEvents: 'all',
               backgroundColor: 'white',
-              padding: '4px 8px',
               borderRadius: '4px',
-            //   border: '1px solid #ccc',
               fontSize: '12px',
-              minWidth: '60px',
               textAlign: 'center',
-              boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
               cursor: 'pointer',
               zIndex: 1000,
             }}

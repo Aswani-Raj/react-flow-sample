@@ -52,8 +52,8 @@ const UpdateNode = ({ selectedNode, onClose, setNodes, closeNodePanel }) => {
   if (!selectedNode) return null;
 
   return (
-    <Panel position="right" style={{ width: '300px', background: 'white', padding: '20px', border: '1px solid #ccc' }}>
-      <h3>Update Node: {selectedNode.id}</h3>
+    <Panel position="right" style={{ width: '280px', background: 'white', padding: '20px' }}>
+      {/* <h3>Update Node: {selectedNode.id}</h3> */}
       
       <div style={{ marginBottom: '15px' }}>
         <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
@@ -74,14 +74,20 @@ const UpdateNode = ({ selectedNode, onClose, setNodes, closeNodePanel }) => {
       <label className="xy-theme__label">Label: </label><input
           value={nodeName}
           onChange={(evt) => setNodeName(evt.target.value)}
-          className="xy-theme__input" /><label className="xy-theme__label">Background: </label><input
+          className="xy-theme__input" /><label className="xy-theme__label">Background: </label>
+          <input
             value={nodeBg}
+            type="color"
               onChange={(evt) => setNodeBg(evt.target.value)}
-              className="xy-theme__input" /><label className="xy-theme__label">Hidden:</label><input
+              className="xy-theme__input" />
+              <div>
+<label className="xy-theme__label">Hidden:</label><input
               type="checkbox"
               checked={nodeHidden}
               onChange={(evt) => setNodeHidden(evt.target.checked)}
               className="xy-theme__checkbox" />
+              </div>
+              
 
       {/* Node Type Dropdown */}
       <div style={{ marginBottom: '15px' }}>
