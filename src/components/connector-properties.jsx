@@ -126,8 +126,15 @@ const ConnectorProperties = (props) => {
             <button
                 onClick={() => {
                     props.setEdges(edges => edges.filter(edge => edge.id !== props.selectedEdge.id));
-                    props.setShowEdgePanel(false);
-                }}
+// Close the edge panel if the function exists
+            if (props.setShowEdgePanel) {
+                props.setShowEdgePanel(false);
+            }
+            
+            // Clear the selected edge
+            if (props.setSelectedEdge) {
+                props.setSelectedEdge(null);
+            }                }}
                 style={{
                     width: '100%',
                     padding: '10px',

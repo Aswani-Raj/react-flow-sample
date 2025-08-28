@@ -119,6 +119,24 @@ const ShapeNode = ({ id,data, selected, setEdges, setNodes, onUpdateNode,clickNo
     }
   };
 
+  const handleDeleteNode = (e) => {
+    
+ e.stopPropagation();
+  if (setNodes && setEdges) {
+    // First, remove any edges connected to this node
+    setEdges((edges) => 
+      edges.filter((edge) => 
+        edge.source !== id && edge.target !== id
+      )
+    );
+    
+    // Then remove the node itself
+    setNodes((nodes) => 
+      nodes.filter((node) => node.id !== id)
+    );
+  }
+};
+
   const shapeStyle = renderShape();
 
   return (
@@ -177,10 +195,8 @@ const ShapeNode = ({ id,data, selected, setEdges, setNodes, onUpdateNode,clickNo
             Update
           </button>
           <button
-            onClick={() => {
-              if (setNodes) {
-                setNodes((nodes) => nodes.filter((node) => node.id !== data.id));
-              }
+            onClick={(e) => {
+              handleDeleteNode(e)
             }}
             style={{
               background: '#dc3545',
