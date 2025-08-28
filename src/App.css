@@ -71,3 +71,22 @@
   overflow-y: auto !important;
   overflow-x: auto !important;
 }
+.primary {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: background-color 0.2s;
+}
+
+.primary:hover {
+  background: #0056b3;
+}
+
+.primary:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+}

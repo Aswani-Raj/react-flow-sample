@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { BaseEdge, EdgeLabelRenderer, getBezierPath, MarkerType, getSmoothStepPath } from '@xyflow/react';
-import ConnectorProperties from './connector-properties';
+import { BaseEdge, EdgeLabelRenderer, MarkerType, getSmoothStepPath } from '@xyflow/react';
 
 const CustomEdge = ({
   id,
@@ -20,7 +19,6 @@ const CustomEdge = ({
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editLabel, setEditLabel] = useState(label || '');
-  const [showToolbar, setShowToolbar] = useState(false);
 
   const [edgePath, labelX, labelY] = getSmoothStepPath({
     sourceX,
@@ -39,15 +37,11 @@ const CustomEdge = ({
           edge.id === id ? { ...edge, label: editLabel } : edge
         )
       );
-    } else {
-      console.error("setEdges function is not available");
     }
     setIsEditing(false);
   };
 
-  const getLineStyle = () => {
-    console.log("line style", data);
-    
+  const getLineStyle = () => {    
     const lineType = data?.lineType || 'solid';
     const edgeColor = data?.edgeColor || '#b1b1b7';
     
@@ -73,9 +67,7 @@ const CustomEdge = ({
 
   const handleConnectorClick = (e)=>{    
     onEdgeClick(id,data, label)
-  }
-  console.log("styleee", getLineStyle());
-  
+  }  
 
   return (
     <>

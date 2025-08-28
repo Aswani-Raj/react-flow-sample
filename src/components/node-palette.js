@@ -1,7 +1,7 @@
 const NodePalette = () => {
   return (
-    <div style={{ width: '115px', backgroundColor: '#f8f9fa', padding: '20px', borderRight: '1px solid #dee2e6' }}>
-      <h3 style={{ marginBottom: '20px', color: '#495057' }}>Node Palette</h3>
+    <div style={{ width: '70px', backgroundColor: '#f8f9fa', padding: '10px', borderRight: '1px solid #dee2e6' }}>
+      {/* <h3 style={{ marginBottom: '20px', color: '#495057' }}>Node Palette</h3> */}
       <div style={{ marginBottom: '20px' }}>
         <h4 style={{ fontSize: '14px', marginBottom: '10px', color: '#6c757d' }}>Shapes</h4>
         
@@ -107,7 +107,8 @@ const NodePalette = () => {
             fontSize: '12px',
             marginBottom: '10px',
             cursor: 'grab',
-            marginTop: "20px"
+            marginTop: "20px",
+            marginLeft: "5px"
           }}
         >
           <div style={{ transform: 'rotate(-45deg)' }}></div>

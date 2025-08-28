@@ -76,12 +76,12 @@ const ShapeNode = ({ id,data, selected, setEdges, setNodes, onUpdateNode,clickNo
     const baseStyle = {
       width: `${dimensions.width}px`,
       height: `${dimensions.height}px`,
-      backgroundColor: backgroundColor,
       border: `1px solid black`,
+      backgroundColor: color,
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      color: color,
+      color: "white",
       fontWeight: 'bold',
       fontSize: '12px',
       textAlign: 'center',
@@ -91,11 +91,14 @@ const ShapeNode = ({ id,data, selected, setEdges, setNodes, onUpdateNode,clickNo
       case 'round-rectangle':
         return {
           ...baseStyle,
+                // backgroundColor: backgroundColor,
+
           borderRadius: '30px', 
         };
       case 'rectangle':
         return {
           ...baseStyle,
+          
         };
       case 'circle':
         return {

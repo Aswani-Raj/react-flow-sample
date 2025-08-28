@@ -22,16 +22,7 @@ import ShapeNode from './components/shape-node';
 
 const defaultViewport = { x: 0, y: 0, zoom: 1.5 };
 const flowKey = 'example-flow';
-
-
-const initialNodes = [
-  // {
-  //   id: '1',
-  //   position: { x: 100, y: 100 },
-  //   data: { label: 'Start' },
-  //   type: 'node-with-toolbar'  },
-];
-
+const initialNodes = []
 const initialEdges = [];
 
 const FlowComponent = () => {
@@ -45,6 +36,33 @@ const FlowComponent = () => {
   const [rfInstance, setRfInstance] = useState(null);
   const { setViewport } = useReactFlow();
   const { getViewport } = useReactFlow();
+  const [copiedNodes, setCopiedNodes] = useState([]);
+  const [copiedEdges, setCopiedEdges] = useState([]);
+  const [history, setHistory] = useState([]);
+  const [historyIndex, setHistoryIndex] = useState(-1);
+  const [undoStack, setUndoStack] = useState([]);
+  const [redoStack, setRedoStack] = useState([]);
+
+
+  // const saveToHistory = useCallback(() => {
+  //   const currentState = { nodes: [...nodes], edges: [...edges] };
+  //   setHistory(prev => {
+  //     const newHistory = prev.slice(0, historyIndex + 1);
+  //     newHistory.push(currentState);
+  //     return newHistory;
+  //   });
+  //   setHistoryIndex(prev => prev + 1);
+  // }, [nodes, edges, historyIndex]);
+
+  const saveState = useCallback(() => {
+    const currentState = {
+      nodes: JSON.parse(JSON.stringify(nodes)),
+      edges: JSON.parse(JSON.stringify(edges))
+    };
+    setUndoStack(prev => [...prev, currentState]);
+    // Clear redo stack when new action is performed
+    setRedoStack([]);
+  }, [nodes, edges]);
 
 const nodeTypes = {
   'shape': (props) => (
@@ -65,11 +83,12 @@ const nodeTypes = {
     />
   ),
 };
+
 useEffect(() => {
     const originalError = console.error;
     console.error = (...args) => {
       if (args[0]?.includes?.('ResizeObserver loop completed with undelivered notifications')) {
-        return; // Suppress this specific error
+        return;
       }
       originalError.apply(console, args);
     };
@@ -78,6 +97,11 @@ useEffect(() => {
       console.error = originalError;
     };
   }, []);
+
+  useEffect(()=>{
+    console.log("historyyy", history, historyIndex);
+
+  },[history,historyIndex])
 
 const handleUpdateNode = (nodeId, nodeData) => {
     setSelectedNode({ id: nodeId, data: nodeData });
@@ -89,27 +113,77 @@ const handleUpdateNode = (nodeId, nodeData) => {
     setShowUpdatePanel(true);
   };
 
-  const onNodesChange = useCallback(
-    (changes) => setNodes((nodesSnapshot) => applyNodeChanges(changes, nodesSnapshot)),
-    [],
+  // const onNodesChange = useCallback(
+  //   (changes) => {
+  //     setNodes((nodesSnapshot) => {
+  //       const newNodes = applyNodeChanges(changes, nodesSnapshot);
+  //       setTimeout(() => saveToHistory(), 100);
+  //       return newNodes;
+  //     });
+  //   },
+  //   [saveToHistory],
+  // );
+
+   const onNodesChange = useCallback(
+    (changes) => {
+      setNodes((nodesSnapshot) => {
+        const newNodes = applyNodeChanges(changes, nodesSnapshot);
+        // Save state for undo/redo
+        setTimeout(() => saveState(), 100);
+        return newNodes;
+      });
+    },
+    [saveState]
   );
 
-  const onEdgesChange = useCallback(
-    (changes) => setEdges((edgesSnapshot) => applyEdgeChanges(changes, edgesSnapshot)),
-    [],
+  // const onEdgesChange = useCallback(
+  //   (changes) => {
+  //     setEdges((edgesSnapshot) => {
+  //       const newEdges = applyEdgeChanges(changes, edgesSnapshot);
+  //       setTimeout(() => saveToHistory(), 100);
+  //       return newEdges;
+  //     });
+  //   },
+  //   [saveToHistory],
+  // );
+
+const onEdgesChange = useCallback(
+    (changes) => {
+      setEdges((edgesSnapshot) => {
+        const newEdges = applyEdgeChanges(changes, edgesSnapshot);
+        // Save state for undo/redo
+        setTimeout(() => saveState(), 100);
+        return newEdges;
+      });
+    },
+    [saveState]
   );
 
-   const onConnect = useCallback(
-  (connection) => {
-    const edge = { 
-      ...connection, 
-      type: 'custom-edge',
-      data: {}, 
-    };
-    setEdges((eds) => addEdge(edge, eds));
-  },
-  [setEdges],
-);
+  const onConnect = useCallback(
+    (connection) => {
+      const edge = { 
+        ...connection, 
+        type: 'custom-edge',
+        data: {}, 
+      };
+      setEdges((eds) => addEdge(edge, eds));
+      // Save state for undo/redo
+      setTimeout(() => saveState(), 100);
+    },
+    [setEdges, saveState]
+  );
+
+//    const onConnect = useCallback(
+//   (connection) => {
+//     const edge = { 
+//       ...connection, 
+//       type: 'custom-edge',
+//       data: {}, 
+//     };
+//     setEdges((eds) => addEdge(edge, eds));
+//   },
+//   [setEdges],
+// );
  
   const onDragOver = useCallback((event) => {
     event.preventDefault();
@@ -200,6 +274,131 @@ const onSave = useCallback(() => {
     setShowEdgePanel(true);
   };
 
+  // Copy selected nodes and edges
+  // const onCopy = useCallback(() => {
+  //   const selectedNodes = nodes.filter(node => node.selected);
+  //   const selectedEdges = edges.filter(edge => edge.selected);
+    
+  //   if (selectedNodes.length > 0) {
+  //     setCopiedNodes(selectedNodes);
+  //     setCopiedEdges(selectedEdges);
+  //   }
+  // }, [nodes, edges]);
+
+  // Paste copied nodes and edges
+  // const onPaste = useCallback(() => {
+  //   if (copiedNodes.length === 0) return;
+
+  //   const offset = 50;
+  //   const newNodes = copiedNodes.map(node => ({
+  //     ...node,
+  //     id: `${node.type}-${Date.now()}-${Math.random()}`,
+  //     position: {
+  //       x: node.position.x + offset,
+  //       y: node.position.y + offset
+  //     },
+  //     selected: false
+  //   }));
+
+  //   const newEdges = copiedEdges.map(edge => {
+  //     const sourceNode = newNodes.find(n => 
+  //       n.position.x === edge.source && n.position.y === edge.position.y
+  //     );
+  //     const targetNode = newNodes.find(n => 
+  //       n.position.x === edge.target && n.position.y === edge.position.y
+  //     );
+      
+  //     return {
+  //       ...edge,
+  //       id: `edge-${Date.now()}-${Math.random()}`,
+  //       source: sourceNode?.id || edge.source,
+  //       target: targetNode?.id || edge.target,
+  //       selected: false
+  //     };
+  //   });
+
+  //   setNodes(prev => [...prev, ...newNodes]);
+  //   setEdges(prev => [...prev, ...newEdges]);
+  //   saveToHistory();
+  // }, [copiedNodes, copiedEdges, saveToHistory]);
+
+   const onCopy = useCallback(() => {
+    const selectedNodes = nodes.filter(node => node.selected);
+    const selectedEdges = edges.filter(edge => edge.selected);
+    
+    if (selectedNodes.length > 0) {
+      setCopiedNodes(selectedNodes);
+      setCopiedEdges(selectedEdges);
+    }
+  }, [nodes, edges]);
+
+  const onPaste = useCallback(() => {
+    if (copiedNodes.length === 0) return;
+
+    // Save current state before pasting
+    saveState();
+
+    const offset = 50;
+    const newNodes = copiedNodes.map(node => ({
+      ...node,
+      id: `${node.type}-${Date.now()}-${Math.random()}`,
+      position: {
+        x: node.position.x + offset,
+        y: node.position.y + offset
+      },
+      selected: false
+    }));
+
+    const newEdges = copiedEdges.map(edge => {
+      const sourceNode = newNodes.find(n => 
+        n.position.x === edge.source && n.position.y === edge.position.y
+      );
+      const targetNode = newNodes.find(n => 
+        n.position.x === edge.target && n.position.y === edge.position.y
+      );
+      
+      return {
+        ...edge,
+        id: `edge-${Date.now()}-${Math.random()}`,
+        source: sourceNode?.id || edge.source,
+        target: targetNode?.id || edge.target,
+        selected: false
+      };
+    });
+
+    setNodes(prev => [...prev, ...newNodes]);
+    setEdges(prev => [...prev, ...newEdges]);
+  }, [copiedNodes, copiedEdges, saveState]);
+
+  // Initialize history with current state
+  useEffect(() => {
+    if (nodes.length > 0 || edges.length > 0) {
+      setHistory([{ nodes: [...nodes], edges: [...edges] }]);
+      setHistoryIndex(0);
+    }
+  }, []);
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.ctrlKey || event.metaKey) {
+        switch (event.key) {
+          case 'c':
+            event.preventDefault();
+            onCopy();
+            break;
+          case 'v':
+            event.preventDefault();
+            onPaste();
+            break;
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [onCopy, onPaste]);
+
   return (
          <div style={{ height: '100vh', width: '100%', display: 'flex' }}>
        <NodePalette/>
@@ -223,26 +422,22 @@ const onSave = useCallback(() => {
           onInit={setRfInstance}
           style={{ width: '100%', height: '100%' }}
           className="custom-react-flow"
-
-  //       defaultEdgeOptions={{
-  //   markerEnd: {
-  //     type: MarkerType.ArrowClosed,
-  //   },
-  //   style: {
-  //     strokeWidth: 1,
-  //     stroke: '#b1b1b7',
-  //   },
-  // }}
       >
         <Background />
         <Panel position="top-right">
-        <button className="primary" onClick={onSave}>
-          Save
-        </button>
-        <button className="primary" onClick={onRestore}>
-          Restore
-        </button>
-      </Panel>
+          <button className="primary" onClick={onSave}>
+            Save
+          </button>
+          <button className="primary" onClick={onRestore}>
+            Restore
+          </button>
+          <button className="primary" onClick={onCopy} style={{ marginLeft: '5px' }}>
+            Copy
+          </button>
+          <button className="primary" onClick={onPaste} style={{ marginLeft: '5px' }}>
+            Paste
+          </button>
+        </Panel>
        <MiniMap nodeStrokeWidth={3} />
        <Controls />
       </ReactFlow>

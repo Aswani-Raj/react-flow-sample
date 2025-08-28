@@ -37,6 +37,9 @@ code {
   overflow-y: auto !important;
   overflow-x: auto !important;
 }
+.react-flow__attribution{
+  visibility: hidden;
+}
 
 /* Custom class for ReactFlow */
 .custom-react-flow {
